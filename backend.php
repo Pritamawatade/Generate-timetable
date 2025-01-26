@@ -3,6 +3,7 @@
 require 'dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
+// include 'navigation.php';
 
 // Connect to the database
 $conn = new mysqli("localhost", "root", "", "timetable");
@@ -11,6 +12,12 @@ $conn = new mysqli("localhost", "root", "", "timetable");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+$cdn_links = '
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $batch = $_POST['batch'];
@@ -62,28 +69,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
 
     // Generate HTML timetable
-    $html = "<h2 style='text-align: center;'>Timetable for Batch: $batch, Semester: $semester</h2>";
-    $html .= "<table border='1' cellpadding='10' cellspacing='0' style='width: 100%; border-collapse: collapse; text-align: center;'>";
-    $html .= "<tr><th>Day</th>";
-
-    foreach ($time_slots as $time_range) {
-        $html .= "<th>$time_range</th>";
-    }
-    $html .= "</tr>";
-
-    foreach ($days as $day) {
-        $html .= "<tr><td>$day</td>";
-        foreach ($time_slots as $time_range) {
-            if (isset($timetable[$day][$time_range])) {
-                $html .= "<td>{$timetable[$day][$time_range]}</td>";
-            } else {
-                $html .= "<td>-</td>";
+    $html = "
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Timetable - $batch Semester $semester</title>
+        $cdn_links
+        <style>
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
             }
+        </style>
+    </head>
+    <body class='bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-8'>
+        <div class='max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden'>
+            <div class='bg-blue-600 text-white p-6 text-center'>
+                <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
+                    Timetable for Batch: $batch, Semester: $semester
+                </h2>
+            </div>
+            
+            <div class='p-6 overflow-x-auto'>
+                <table class='w-full text-sm text-left text-gray-600 border-collapse' id='timetableAnimation'>
+                    <thead class='bg-blue-100 text-blue-800'>
+                        <tr>
+                            <th class='p-4 font-bold border'>Day</th>";
+    
+        foreach ($time_slots as $time_range) {
+            $html .= "<th class='p-4 font-bold border'>$time_range</th>";
         }
-        $html .= "</tr>";
-    }
-
-    $html .= "</table>";
+        $html .= "</tr></thead><tbody>";
+    
+        foreach ($days as $day) {
+            $html .= "<tr class='hover:bg-blue-50 transition-colors'><td class='p-4 font-semibold border'>$day</td>";
+            foreach ($time_slots as $time_range) {
+                $cellContent = isset($timetable[$day][$time_range]) 
+                    ? "{$timetable[$day][$time_range]}" 
+                    : "<span class='text-gray-400'>-</span>";
+                $html .= "<td class='p-4 border'>$cellContent</td>";
+            }
+            $html .= "</tr>";
+        }
+    
+        $html .= "</tbody></table>
+            </div>
+            
+            <div class='p-6 text-center'>
+                <form method='post' class='inline-block'>
+                    <input type='hidden' name='batch' value='$batch'>
+                    <input type='hidden' name='semester' value='$semester'>
+                    <button type='submit' name='generate_pdf' class='bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition-all transform hover:scale-105 hover:shadow-lg'>
+                        Download PDF
+                    </button>
+                </form>
+            </div>
+        </div>
+    
+        <script>
+            // GSAP Animations
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Fade in table rows
+            gsap.from('#timetableAnimation tbody tr', {
+                opacity: 0,
+                y: 50,
+                stagger: 0.1,
+                duration: 0.5,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: '#timetableAnimation',
+                    start: 'top 80%'
+                }
+            });
+    
+            // Hover effects for table rows
+            document.querySelectorAll('#timetableAnimation tbody tr').forEach(row => {
+                row.addEventListener('mouseenter', () => {
+                    gsap.to(row, {
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        scale: 1.02,
+                        duration: 0.3
+                    });
+                });
+                row.addEventListener('mouseleave', () => {
+                    gsap.to(row, {
+                        backgroundColor: 'transparent',
+                        scale: 1,
+                        duration: 0.3
+                    });
+                });
+            });
+        </script>
+    </body>
+    </html>
+    ";
 
     // Check if PDF generation is requested
     if (isset($_POST['generate_pdf'])) {
@@ -99,11 +181,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo $html;
 
     // Display Download as PDF button
-    echo "<form method='post'>
-        <input type='hidden' name='batch' value='$batch'>
-        <input type='hidden' name='semester' value='$semester'>
-        <input type='submit' name='generate_pdf' value='Download as PDF' style='margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;'>
-    </form>";
+    // echo "<form method='post'>
+    //     <input type='hidden' name='batch' value='$batch'>
+    //     <input type='hidden' name='semester' value='$semester'>
+    //     <input type='submit' name='generate_pdf' value='Download as PDF' style='margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;'>
+    // </form>";
 } else {
     echo "Invalid request method.";
 }
