@@ -1,6 +1,8 @@
 
 <?php
 include 'db_connection.php';
+include 'navigation.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

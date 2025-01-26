@@ -1,6 +1,6 @@
 <?php
 require_once 'db_connection.php'; // Replace with your database connection file
-
+require_once 'navigation.php';
 // Handle delete operations
 if (isset($_GET['delete']) && isset($_GET['type'])) {
     $id = intval($_GET['delete']);
