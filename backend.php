@@ -1,6 +1,6 @@
 <?php
-// Include the database connection file
-include 'db_connection.php';
+// Include the database connection
+require_once 'db_connection.php'; // Adjust the path if needed
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get batch and semester from the request
@@ -31,72 +31,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Initialize the timetable matrix
-    $timetable = [
-        "Monday" => [],
-        "Tuesday" => [],
-        "Wednesday" => [],
-        "Thursday" => [],
-        "Friday" => [],
-        "Saturday" => []
-    ];
+    // Check if there are results
+    if ($result->num_rows > 0) {
+        echo "<table border='1' width='100%' style='text-align: center; border-collapse: collapse;'>";
+        echo "<tr><th>Day</th><th>Time Slot</th><th>Subject</th><th>Teacher Initials</th></tr>";
 
-    // Populate the timetable matrix with data
-    while ($row = $result->fetch_assoc()) {
-        // $timeSlot = date("h:i A", strtotime($row['time_slot'])) . " - " . date("h:i A", strtotime($row['time_slot_end']));
-        // $timetable[$row['day']][$timeSlot] = $row['subject_name'] . " [" . $row['teacher_initials'] . "]";
-        echo "
-        <table style="/width:100%; height:70%; border:1px solid black; font-size:10px; line-height:1.5; table-layout:fixed;/"  >
-        <tr>
-                <td></td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-                <td>10:45-11:45</td>
-            </tr>
-            <tr>
-                <td>" . $row['day'] . "</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-                <td>" . $row['subject_name'] . " [" . $row['teacher_initials'] . "]</td>
-            </tr>
-        </table>
-    ";
-    
+        // Output data for each row
+        while ($row = $result->fetch_assoc()) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($row['day']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['time_slot']) . " - " . htmlspecialchars($row['time_slot_end']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['subject_name']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['teacher_initials']) . "</td>";
+            echo "</tr>";
+        }
+
+        echo "</table>";
+    } else {
+        echo "<p>No timetable data found for the selected batch and semester.</p>";
     }
 
-    // Close the statement and connection
-    // $stmt->close();
-    // $conn->close();
-
-    // // Return the timetable as a JSON response
-    // header('Content-Type: application/json');
-    // echo json_encode($timetable);
-    exit();
+    $stmt->close();
+} else {
+    echo "<p>Invalid request method.</p>";
 }
+
+$conn->close();
 ?>
-
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
-
-</head>
-
-<body>
-
-</body>
-
-</html>
