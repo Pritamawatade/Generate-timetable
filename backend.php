@@ -1,19 +1,28 @@
 <?php
-// Include the database connection
-require_once 'db_connection.php'; // Adjust the path if needed
+// Include dompdf library from the folder you pasted
+require 'dompdf/autoload.inc.php';
+
+use Dompdf\Dompdf;
+
+// Connect to the database
+$conn = new mysqli("localhost", "root", "", "timetable");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get batch and semester from the request
     $batch = $_POST['batch'];
     $semester = $_POST['semester'];
 
-    // Prepare the query to fetch timetable data
     $sql = "
         SELECT 
             tt.day,
             tt.time_slot,
             tt.time_slot_end,
             sub.name AS subject_name,
+            sub.type AS subject_type,
             CONCAT(UPPER(LEFT(t.first_name, 1)), UPPER(LEFT(t.middle_name, 1)), UPPER(LEFT(t.last_name, 1))) AS teacher_initials
         FROM timetable tt
         JOIN students st ON tt.batch_id = st.id
@@ -22,38 +31,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         WHERE st.batch = ? AND tt.semester = ?
         ORDER BY 
             FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
-            tt.time_slot
+            TIME(tt.time_slot)
     ";
 
-    // Execute the query
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $batch, $semester);
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Check if there are results
-    if ($result->num_rows > 0) {
-        echo "<table border='1' width='100%' style='text-align: center; border-collapse: collapse;'>";
-        echo "<tr><th>Day</th><th>Time Slot</th><th>Subject</th><th>Teacher Initials</th></tr>";
+    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    $time_slots = [];
+    $timetable = [];
 
-        // Output data for each row
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['day']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['time_slot']) . " - " . htmlspecialchars($row['time_slot_end']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['subject_name']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['teacher_initials']) . "</td>";
-            echo "</tr>";
+    while ($row = $result->fetch_assoc()) {
+        $start_time = date("h:i A", strtotime($row['time_slot']));
+        $end_time = date("h:i A", strtotime($row['time_slot_end']));
+        $time_range = "$start_time - $end_time";
+
+        if (!in_array($time_range, $time_slots)) {
+            $time_slots[] = $time_range;
         }
 
-        echo "</table>";
-    } else {
-        echo "<p>No timetable data found for the selected batch and semester.</p>";
+        $timetable[$row['day']][$time_range] = "{$row['subject_name']} ({$row['subject_type']}) [{$row['teacher_initials']}]";
     }
 
-    $stmt->close();
+    usort($time_slots, function($a, $b) {
+        $a_start = strtotime(explode(' - ', $a)[0]);
+        $b_start = strtotime(explode(' - ', $b)[0]);
+        return $a_start - $b_start;
+    });
+
+    // Generate HTML timetable
+    $html = "<h2 style='text-align: center;'>Timetable for Batch: $batch, Semester: $semester</h2>";
+    $html .= "<table border='1' cellpadding='10' cellspacing='0' style='width: 100%; border-collapse: collapse; text-align: center;'>";
+    $html .= "<tr><th>Day</th>";
+
+    foreach ($time_slots as $time_range) {
+        $html .= "<th>$time_range</th>";
+    }
+    $html .= "</tr>";
+
+    foreach ($days as $day) {
+        $html .= "<tr><td>$day</td>";
+        foreach ($time_slots as $time_range) {
+            if (isset($timetable[$day][$time_range])) {
+                $html .= "<td>{$timetable[$day][$time_range]}</td>";
+            } else {
+                $html .= "<td>-</td>";
+            }
+        }
+        $html .= "</tr>";
+    }
+
+    $html .= "</table>";
+
+    // Check if PDF generation is requested
+    if (isset($_POST['generate_pdf'])) {
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        $dompdf->stream("timetable_batch{$batch}_semester{$semester}.pdf", ["Attachment" => true]);
+        exit;
+    }
+
+    // Display timetable on the webpage
+    echo $html;
+
+    // Display Download as PDF button
+    echo "<form method='post'>
+        <input type='hidden' name='batch' value='$batch'>
+        <input type='hidden' name='semester' value='$semester'>
+        <input type='submit' name='generate_pdf' value='Download as PDF' style='margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;'>
+    </form>";
 } else {
-    echo "<p>Invalid request method.</p>";
+    echo "Invalid request method.";
 }
 
 $conn->close();
