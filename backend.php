@@ -127,6 +127,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
             </div>
         </div>
+
+            <div class='fixed bottom-10 right-10'>
+                <a href='index.php'>
+                    <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 animate-bounce'>
+                        <svg class='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 19l-7-7m0 0l7-7m-7 7h18'></path></svg>
+                        Back to Home
+                    </button>
+                </a>
+            </div>
+        
     
         <script>
             // GSAP Animations

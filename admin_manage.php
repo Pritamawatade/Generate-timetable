@@ -38,110 +38,175 @@ $timetable_result = $conn->query($timetable_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Teachers and Subjects</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto mt-8 p-12">
-        <h1 class="text-2xl font-bold mb-4">Manage Teachers</h1>
-        <table class="min-w-full bg-white border rounded-xl mb-8 shadow-lg">
-            <thead>
-                <tr>
-                    <th class="border px-4 py-2">ID</th>
-                    <th class="border px-4 py-2">First Name</th>
-                    <th class="border px-4 py-2">Middle Name</th>
-                    <th class="border px-4 py-2">Last Name</th>
-                    <th class="border px-4 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($teacher = $teachers_result->fetch_assoc()): ?>
-                <tr>
-                    <td class="border px-4 py-2"><?php echo $teacher['id']; ?></td>
-                    <td class="border px-4 py-2"><?php echo $teacher['first_name']; ?></td>
-                    <td class="border px-4 py-2"><?php echo $teacher['middle_name']; ?></td>
-                    <td class="border px-4 py-2"><?php echo $teacher['last_name']; ?></td>
-                    <td class="border px-4 py-2">
-                        <a href="edit_teacher.php?id=<?php echo $teacher['id']; ?>" class="text-blue-500 hover:underline">Edit</a> | 
-                        <a href="?delete=<?php echo $teacher['id']; ?>&type=teacher" class="text-red-500 hover:underline" onclick="return confirm('Are you sure you want to delete this teacher?');">Delete</a>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-
-        <h1 class="text-2xl font-bold mb-4">Manage Subjects</h1>
-        <table class="min-w-full bg-white border rounded-xl shadow-lg">
-            <thead>
-                <tr>
-                    <th class="border px-4 py-2">ID</th>
-                    <th class="border px-4 py-2">Name</th>
-                    <th class="border px-4 py-2">Type</th>
-                    <th class="border px-4 py-2">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($subject = $subjects_result->fetch_assoc()): ?>
-                <tr>
-                    <td class="border px-4 py-2"><?php echo $subject['id']; ?></td>
-                    <td class="border px-4 py-2"><?php echo $subject['name']; ?></td>
-                    <td class="border px-4 py-2"><?php echo $subject['type']; ?></td>
-                    <td class="border px-4 py-2">
-                        <a href="edit_subject.php?id=<?php echo $subject['id']; ?>" class="text-blue-500 hover:underline">Edit</a> | 
-                        <a href="?delete=<?php echo $subject['id']; ?>&type=subject" class="text-red-500 hover:underline" onclick="return confirm('Are you sure you want to delete this subject?');">Delete</a>
-                    </td>
-                </tr>
-                <?php endwhile; ?>
-            </tbody>
-        </table>
-
-<h1 class="text-2xl font-bold mb-4">Manage Timetable</h1>
-<table class="min-w-full bg-white border rounded-xl shadow-lg">
-    <thead>
-        <tr>
-            <th class="py-2 px-4 border-b">ID</th>
-            <th class="py-2 px-4 border-b">Batch ID</th>
-            <th class="py-2 px-4 border-b">Semester</th>
-            <th class="py-2 px-4 border-b">Day</th>
-            <th class="py-2 px-4 border-b">Time Slot</th>
-            <th class="py-2 px-4 border-b">Time End</th>
-            <th class="py-2 px-4 border-b">Subject ID</th>
-            <th class="py-2 px-4 border-b">Teacher ID</th>
-            <th class="py-2 px-4 border-b">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php while ($row = $timetable_result->fetch_assoc()): ?>
-            <tr>
-                <td class="py-2 px-4 border-b"><?php echo $row['id']; ?></td>
-                <td class="py-2 px-4 border-b"><?php echo $row['batch_id']; ?></td>
-                <td class="py-2 px-4 border-b"><?php echo $row['semester']; ?></td>
-                <td class="py-2 px-4 border-b"><?php echo $row['day']; ?></td>
-                <td class="py-2 px-4 border-b">
+<body>
+    <div class="container mx-auto p-8">
+        <?php
+        // Reset result pointers
+        // $conn->data_seek(0);
+        $teachers_result = $conn->query($teachers_query);
+        ?>
+        <!-- Teachers Section -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8 mb-12">
+            <h1 class="text-3xl font-bold mb-6 text-blue-800">Manage Teachers</h1>
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-blue-100">
+                        <th class="p-3">ID</th>
+                        <th class="p-3">First Name</th>
+                        <th class="p-3">Middle Name</th>
+                        <th class="p-3">Last Name</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <?php 
-                        $time = strtotime($row['time_slot']);
-                        echo date('g:i A', $time);
+                    // Ensure we have a valid result set
+                    if ($teachers_result && $teachers_result->num_rows > 0):
+                        while ($teacher = $teachers_result->fetch_assoc()): 
                     ?>
-                </td>
-                <td class="py-2 px-4 border-b">
+                    <tr class="border-b hover:bg-blue-50">
+                        <td class="p-3"><?php echo htmlspecialchars($teacher['id']); ?></td>
+                        <td class="p-3"><?php echo htmlspecialchars($teacher['first_name']); ?></td>
+                        <td class="p-3"><?php echo htmlspecialchars($teacher['middle_name']); ?></td>
+                        <td class="p-3"><?php echo htmlspecialchars($teacher['last_name']); ?></td>
+                        <td class="p-3">
+                            <a href="edit_teacher.php?id=<?php echo $teacher['id']; ?>" class="text-blue-500 mr-2">Edit</a>
+                            <a href="?delete=<?php echo $teacher['id']; ?>&type=teacher" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</a>
+                        </td>
+                    </tr>
                     <?php 
-                        $time = strtotime($row['time_slot_end']);
-                        echo date('g:i A', $time);
+                        endwhile; 
+                    else:
+                        echo "<tr><td colspan='5' class='text-center p-4'>No teachers found</td></tr>";
+                    endif; 
                     ?>
-                </td>
-                <td class="py-2 px-4 border-b"><?php echo $row['subject_id']; ?></td>
-                <td class="py-2 px-4 border-b"><?php echo $row['teacher_id']; ?></td>
-                <td class="py-2 px-4 border-b">
-                    <a href="edit_timetable.php?id=<?php echo $row['id']; ?>" class="text-blue-500 hover:underline">Edit</a>
-                    <form action="delete_timetable.php" method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
-                        <button type="submit" class="text-red-500 hover:underline">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-    </tbody>
-</table>
-                
+                </tbody>
+            </table>
+        </div>
+
+        <?php
+        // Reset result pointers
+        // $conn->data_seek(0);
+        $subjects_result = $conn->query($subjects_query);
+        ?>
+        <!-- Subjects Section -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8 mb-12">
+            <h1 class="text-3xl font-bold mb-6 text-green-800">Manage Subjects</h1>
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-green-100">
+                        <th class="p-3">ID</th>
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php 
+                    // Ensure we have a valid result set
+                    if ($subjects_result && $subjects_result->num_rows > 0):
+                        while ($subject = $subjects_result->fetch_assoc()): 
+                    ?>
+                    <tr class="border-b hover:bg-green-50">
+                        <td class="p-3"><?php echo htmlspecialchars($subject['id']); ?></td>
+                        <td class="p-3"><?php echo htmlspecialchars($subject['name']); ?></td>
+                        <td class="p-3"><?php echo htmlspecialchars($subject['type']); ?></td>
+                        <td class="p-3">
+                            <a href="edit_subject.php?id=<?php echo $subject['id']; ?>" class="text-blue-500 mr-2">Edit</a>
+                            <a href="?delete=<?php echo $subject['id']; ?>&type=subject" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</a>
+                        </td>
+                    </tr>
+                    <?php 
+                        endwhile; 
+                    else:
+                        echo "<tr><td colspan='4' class='text-center p-4'>No subjects found</td></tr>";
+                    endif; 
+                    ?>
+                </tbody>
+            </table>
+        </div>
+
+        <?php
+        // Reset result pointers
+       
+        $timetable_result = $conn->query($timetable_query);
+        ?>
+        <!-- Timetable Section -->
+        <div class="bg-white shadow-2xl rounded-2xl p-8">
+            <h1 class="text-3xl font-bold mb-6 text-purple-800">Manage Timetable</h1>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-purple-100">
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Batch ID</th>
+                            <th class="p-3">Semester</th>
+                            <th class="p-3">Day</th>
+                            <th class="p-3">Time Slot</th>
+                            <th class="p-3">Time End</th>
+                            <th class="p-3">Subject ID</th>
+                            <th class="p-3">Teacher ID</th>
+                            <th class="p-3">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        // Ensure we have a valid result set
+                        if ($timetable_result && $timetable_result->num_rows > 0):
+                            while ($row = $timetable_result->fetch_assoc()): 
+                        ?>
+                        <tr class="border-b hover:bg-purple-50">
+                            <td class="p-3"><?php echo htmlspecialchars($row['id']); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['batch_id']); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['semester']); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['day']); ?></td>
+                            <td class="p-3"><?php echo date('g:i A', strtotime($row['time_slot'])); ?></td>
+                            <td class="p-3"><?php echo date('g:i A', strtotime($row['time_slot_end'])); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['subject_id']); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['teacher_id']); ?></td>
+                            <td class="p-3">
+                                <a href="edit_timetable.php?id=<?php echo $row['id']; ?>" class="text-blue-500 mr-2">Edit</a>
+                                <form action="delete_timetable.php" method="POST" style="display:inline;">
+                                    <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+                                    <button type="submit" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <?php 
+                            endwhile; 
+                        else:
+                            echo "<tr><td colspan='9' class='text-center p-4'>No timetable entries found</td></tr>";
+                        endif; 
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+   
+
+
+    <script>
+        // GSAP Animations
+        gsap.from(".bg-white", {
+            opacity: 0,
+            y: 50,
+            stagger: 0.2,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+    </script>
 </body>
+
 </html>

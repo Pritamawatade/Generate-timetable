@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-4">
                     <label for="last_name" class="block text-gray-700 font-bold mb-2">Subject Type:</label>
                     <select id="last_name" name="last_name" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                        <option value="Practical" <?php echo $subject['type'] == 'Practical' ? 'selected' : ''; ?>>Practical</option>
+                        <option value="LAB" <?php echo $subject['type'] == 'LAB' ? 'selected' : ''; ?>>LAB</option>
                         <option value="Theory" <?php echo $subject['type'] == 'Theory' ? 'selected' : ''; ?>>Theory</option>
                     </select>
                 </div>

@@ -1,6 +1,7 @@
 <?php
 // teacher_dashboard.php
 session_start();
+// include 'navigation.php';
 include 'db_connection.php';
 
 if (!isset($_SESSION['teacher_id'])) {

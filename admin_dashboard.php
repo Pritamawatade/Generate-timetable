@@ -1,7 +1,7 @@
 
 <?php
 include 'db_connection.php';
-include 'navigation.php';
+// include 'navigation.php';
 
 ?>
 <!DOCTYPE html>
@@ -9,172 +9,172 @@ include 'navigation.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <title>Admin Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+        }
+        .card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .card:hover {
+            box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.08);
+            transform: translateY(-10px);
+        }
+    </style>
+    <style>
+        body {
+            background: linear-gradient(135deg, #f6f8f9 0%, #e5ebee 100%);
+            opacity: 1 !important;
+        }
+        * {
+            opacity: 1 !important;
+        }
+    </style>
 </head>
-<body class="bg-gray-200 p-6">
-    <h1 class="text-3xl mb-6 text-center">Admin Dashboard</h1>
-    <div class="text-center mb-8">
-        <a href="admin_manage.php" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Manage Teachers and Subjects</a>
+<body class="min-h-screen px-8 py-16">
+    <div class="container mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-12 text-blue-800 tracking-tight">
+            Admin Dashboard
+        </h1>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Manage Section -->
+            <div class="card bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:scale-105">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-700">Quick Actions</h2>
+                <a href="admin_manage.php" class="block w-full bg-blue-500 text-white py-3 rounded-lg text-center hover:bg-blue-600 transition-colors">
+                    Manage Teachers & Subjects
+                </a>
+            </div>
+
+            <!-- Add Teacher Section -->
+            <div class="card bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:scale-105">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-700">Add Teacher</h2>
+                <form action="your_add_teacher_script.php" method="POST" class="space-y-4">
+                    <input type="text" name="first_name" placeholder="First Name" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <input type="text" name="middle_name" placeholder="Middle Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <input type="text" name="last_name" placeholder="Last Name" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
+                        Add Teacher
+                    </button>
+                </form>
+            </div>
+
+            <!-- Add Subject Section -->
+            <div class="card bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:scale-105 ">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-700">Add Subject</h2>
+                <form action="your_add_subject_script.php" method="POST" class="space-y-4">
+                    <input type="text" name="subject_name" placeholder="Subject Name" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <select name="subject_type" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Theory">Theory</option>
+                        <option value="LAB">LAB</option>
+                    </select>
+                    <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
+                        Add Subject
+                    </button>
+                </form>
+            </div>
+
+            <!-- Generate Timetable Section -->
+            <div class="card bg-white rounded-2xl shadow-lg p-8 transform transition-all hover:scale-105 col-span-2">
+                <h2 class="text-3xl font-semibold mb-6 text-blue-800 text-center">Generate Timetable</h2>
+            <form action="your_generate_timetable_script.php" method="POST" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="space-y-4">
+                    <select name="batch" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Batch</option>
+                        <option value="C1">C1</option>
+                        <option value="C2">C2</option>
+                        <option value="C3">C3</option>
+                    </select>
+                    <select name="semester" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Semester</option>
+                        <option value="1st year">1st year</option>
+                        <option value="2nd year">2nd year</option>
+                        <option value="3rd year">3rd year</option>
+                    </select>
+                </div>
+                <div class="space-y-4">
+                    <select name="day" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Day</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                    </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="time" name="time_slot" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="time" name="time_slot_end" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="md:col-span-2 space-y-4">
+                    <select name="subject" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Subject</option>
+                        <?php
+                        $subject_query = "SELECT name FROM subjects";
+                        $subject_result = $conn->query($subject_query);
+                        while ($row = $subject_result->fetch_assoc()) {
+                            echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
+                        }
+                        ?>
+                    </select>
+                    <select name="teacher" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Teacher</option>
+                        <?php
+                        $teacher_query = "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
+                        $teacher_result = $conn->query($teacher_query);
+                        while ($row = $teacher_result->fetch_assoc()) {
+                            echo '<option value="' . $row['full_name'] . '">' . $row['full_name'] . '</option>';
+                        }
+                        ?>
+                    </select>
+                    <button type="submit" class="w-full bg-indigo-500 text-white py-4 rounded-lg hover:bg-indigo-600 transition-colors text-lg font-semibold">
+                        Generate Timetable
+                    </button>
+                </div>
+            </form>
+        </div>
+
     </div>
 
-    <!-- Add Teacher Section -->
-    <div class="mb-8">
-        <h2 class="text-2xl mb-4">Add Teacher</h2>
-        <form class="bg-white p-4 rounded shadow-md" action="your_add_teacher_script.php" method="POST">
-            <div class="mb-4">
-                <label class="block text-gray-700" for="first_name">First Name</label>
-                <input class="mt-1 block w-full border border-gray-300 rounded-md p-2" type="text" id="first_name" name="first_name" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700" for="middle_name">Middle Name</label>
-                <input class="mt-1 block w-full border border-gray-300 rounded-md p-2" type="text" id="middle_name" name="middle_name">
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700" for="last_name">Last Name</label>
-                <input class="mt-1 block w-full border border-gray-300 rounded-md p-2" type="text" id="last_name" name="last_name" required>
-            </div>
-            <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" type="submit">Add Teacher</button>
-        </form>
+    <div class="fixed bottom-10 right-10 cursor-pointer">
+        <a href="index.php">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Home
+            </button>
+        </a>
     </div>
 
-    <!-- Add Subject Section -->
-    <div class="mb-8">
-        <h2 class="text-2xl mb-4">Add Subject</h2>
-        <form class="bg-white p-4 rounded shadow-md" action="your_add_subject_script.php" method="POST">
-            <div class="mb-4">
-                <label class="block text-gray-700" for="subject_name">Subject Name</label>
-                <input class="mt-1 block w-full border border-gray-300 rounded-md p-2" type="text" id="subject_name" name="subject_name" required>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700" for="subject_type">Subject Type</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="subject_type" name="subject_type" required>
-                    <option value="Theory">Theory</option>
-                    <option value="Practical">Practical</option>
-                </select>
-            </div>
-            <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" type="submit">Add Subject</button>
-        </form>
-    </div>
-
-    <!-- Generate Timetable Section -->
-    <div>
-        <h2 class="text-2xl mb-4">Generate Timetable</h2>
-        <form class="bg-white p-4 rounded shadow-md" action="your_generate_timetable_script.php" method="POST">
-            <div class="mb-4">
-                <label class="block text-gray-700" for="batch">Batch</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="batch" name="batch" required>
-                    <option value="C1">C1</option>
-                    <option value="C2">C2</option>
-                    <option value="C3">C3</option>
-                    <!-- Add more batches as needed -->
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700" for="semester">Semester</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="semester" name="semester" required>
-                    <option value="1st year">1st year</option>
-                    <option value="2nd year">2nd year</option>
-                    <option value="3rd year">3rd year</option>
-                    <!-- Add more semesters as needed -->
-                </select>
-            </div>
-            <div class="mb-4">
-                <label class="block text-gray-700" for="day">Day</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="day" name="day" required>
-                    <option value="Monday">Monday</option>
-                    <option value="Tuesday">Tuesday</option>
-                    <option value="Wednesday">Wednesday</option>
-                    <option value="Thursday">Thursday</option>
-                    <option value="Friday">Friday</option>
-                    <option value="Saturday">Saturday</option>
-                    <!-- Add more days as needed -->
-                </select>
-            </div>
-            <!-- <div class="mb-4">
-                <label class="block text-gray-700" for="time_slot">Time Slot</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="time_slot" name="time_slot" required>
-                    <option value="9:00 AM - 10:00 AM">9:00 AM - 10:00 AM</option>
-                    <option value="10:15 AM - 11:15 AM">10:15 AM - 11:15 AM</option>
-                    <option value="11:15 AM - 12:15 AM">11:15 AM - 12:15 AM</option>
-                    <option value="12:15 AM - 1:15 PM">12:15 AM - 1:15 PM</option>
-                    <option value="01:40 AM - 02:40 PM">01:40 AM - 02:40 PM</option>
-                    <option value="02:40 AM - 03:40 PM">02:40 AM - 03:40 PM</option>
-                    <option value="03:45 AM - 04:45 PM">03:45 AM - 04:45 PM</option>
-                    <option value="04:45 AM - 05:45 PM">04:45 AM - 05:45 PM</option>
-                    <!-- Add more time slots as needed -->
-                <!-- </select> -->
-            <!-- </div> -->
+    <script>
+        // GSAP Animations
+        gsap.from(".card", {
+            opacity: 0,
+            y: 50,
+            stagger: 0.9999,
+            duration: 0.8,
+            ease: "power2.out"
+        });
+    </script> 
 
 
+  
 
-            <div class="mb-4">
-    <label for="time_slot" class="block text-gray-700 font-bold mb-2">Start Time:</label>
-    <input 
-        type="time" 
-        id="time_slot" 
-        name="time_slot" 
-        value="<?php echo isset($_POST['start_time']) ? htmlspecialchars($_POST['start_time']) : ''; ?>" 
-        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        required
-    >
-</div>
-
-<div class="mb-4">
-    <label for="time_slot_end" class="block text-gray-700 font-bold mb-2">End Time:</label>
-    <input 
-        type="time" 
-        id="time_slot_end" 
-        name="time_slot_end" 
-        value="<?php echo isset($timetable['time_slot_end']) ? htmlspecialchars($timetable['time_slot_end']) : ''; ?>" 
-        class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" 
-        required
-    >
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            <div class="mb-4">
-    <label class="block text-gray-700" for="subject">Subject</label>
-    <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="subject" name="subject" required>
-        <?php
-        // Fetch subjects
-        $subject_query = "SELECT name FROM subjects";
-        $subject_result = $conn->query($subject_query);
-        while ($row = $subject_result->fetch_assoc()) {
-            echo '<option value="' . $row['name'] . '">' . $row['name'] . '</option>';
-        }
-        ?>
-    </select>
-</div>
-<div class="mb-4">
-    <label class="block text-gray-700" for="teacher">Teacher</label>
-    <select class="mt-1 block w-full border border-gray-300 rounded-md p-2" id="teacher" name="teacher" required>
-        <?php
-        // Fetch teachers
-        $teacher_query = "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
-        $teacher_result = $conn->query($teacher_query);
-        while ($row = $teacher_result->fetch_assoc()) {
-            echo '<option value="' . $row['full_name'] . '">' . $row['full_name'] . '</option>';
-        }
-        ?>
-    </select>
-</div>
-
-
-            <button class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600" type="submit">Generate Timetable</button>
-        </form>
-    </div>
+    <script>
+        // GSAP Animations
+        gsap.from(".fixed .home", {
+            opacity: 1,
+            scale: 0.8,
+            duration: 0.8,
+            ease: "power2.out",
+            delay: 1
+        });
+    </script>
+    
 </body>
 </html>

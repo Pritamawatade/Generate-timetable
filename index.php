@@ -22,8 +22,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="student.php">Student Portal</a></li>
-                    <li class="nav-item"><a class="nav-link" href="teacher_login.php">Teacher Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="admin_login.php">Admin Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="teacher_dashboard.php">Teacher Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="admin_dashboard.php">Admin Dashboard</a></li>
                 </ul>
             </div>
         </div>
