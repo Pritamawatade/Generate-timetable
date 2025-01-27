@@ -18,6 +18,7 @@ $sql = "
         tt.time_slot,
         tt.time_slot_end,
         tt.semester,
+        tt.lab_allocation,
         st.batch,
         sub.name AS subject_name,
         t.first_name AS teacher_name
@@ -71,6 +72,7 @@ $conn->close();
                             <th class="px-4 py-3 text-left">Semester</th>
                             <th class="px-4 py-3 text-left">Batch</th>
                             <th class="px-4 py-3 text-left">Subject</th>
+                            <th class="px-4 py-3 text-left">Lab Allocation</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,6 +94,7 @@ $conn->close();
                                     <td class="px-4 py-3"><?php echo htmlspecialchars($row['semester']); ?></td>
                                     <td class="px-4 py-3"><?php echo htmlspecialchars($row['batch']); ?></td>
                                     <td class="px-4 py-3"><?php echo htmlspecialchars($row['subject_name']); ?></td>
+                                    <td class="px-4 py-3"><?php echo htmlspecialchars($row['lab_allocation']); ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>

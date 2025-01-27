@@ -15,10 +15,12 @@
             <div>
                 <label for="semester" class="block text-gray-700 font-bold mb-2">Select Semester:</label>
                 <select id="semester" name="semester" class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <option value="">-- Select Semester --</option>
-                    <option value="1st year">1st Year</option>
-                    <option value="2nd year">2nd Year</option>
-                    <option value="3rd year">3rd Year</option>
+                <option value="1st semester">1st Semester</option>
+                    <option value="2nd semester">2nd Semester</option>
+                    <option value="3rd semester">3rd Semester</option>
+                    <option value="4th semester">4th Semester</option>
+                    <option value="5th semester">5th Semester</option>
+                    <option value="6th semester">6th Semester</option>
                 </select>
             </div>
 
@@ -46,105 +48,6 @@
                 </div>
             </div>
     </div>
-    <!-- <script>
-        // Handle form submission
-        document.getElementById('timetableForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
 
-            const semester = document.getElementById('semester').value;
-            const batch = document.getElementById('batch').value;
-
-            if (!semester || !batch) {
-                alert('Please select both semester and batch.');
-                return;
-            }
-
-            try {
-                // Fetch timetable data from backend
-                const response = await fetch('backend.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ batch, semester })
-            });
-                if (!response.ok) {
-                    throw new Error('Failed to fetch timetable.');
-                }
-
-                const data = await response.json();
-                console.log("data = ",data);
-                
-                // Display timetable
-                displayTimetable(data);
-            } catch (error) {
-                console.error(error);
-                alert('An error occurred while fetching the timetable.');
-            }
-        });
-
-        function displayTimetable(data) {
-            const timetableSection = document.getElementById('timetableSection');
-            const timetableContainer = document.getElementById('timetableContainer');
-
-            // Clear previous timetable
-            timetableContainer.innerHTML = '';
-
-            // Create timetable table
-            const table = document.createElement('table');
-            table.className = 'table-auto border-collapse border border-gray-300 w-full';
-
-            // Add header row (time slots)
-            const thead = document.createElement('thead');
-            const headerRow = document.createElement('tr');
-            headerRow.className = 'bg-gray-200';
-
-            const daysColumn = document.createElement('th');
-            daysColumn.className = 'border border-gray-300 px-4 py-2';
-            daysColumn.textContent = 'Days / Time';
-            headerRow.appendChild(daysColumn);
-
-            // Add time slots
-            const timeSlots = ['10:45 AM - 11:45 AM', '11:45 AM - 12:45 PM', '12:45 PM - 1:45 PM', '1:45 PM - 2:45 PM', '2:45 PM - 3:45 PM', '3:45 PM - 4:45 PM'];
-            timeSlots.forEach(slot => {
-                const th = document.createElement('th');
-                th.className = 'border border-gray-300 px-4 py-2';
-                th.textContent = slot;
-                headerRow.appendChild(th);
-            });
-
-            thead.appendChild(headerRow);
-            table.appendChild(thead);
-
-            // Add timetable data
-            const tbody = document.createElement('tbody');
-
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            days.forEach(day => {
-                const row = document.createElement('tr');
-
-                const dayCell = document.createElement('td');
-                dayCell.className = 'border border-gray-300 px-4 py-2 font-bold';
-                dayCell.textContent = day;
-                row.appendChild(dayCell);
-
-                timeSlots.forEach(slot => {
-                    const cell = document.createElement('td');
-                    cell.className = 'border border-gray-300 px-4 py-2';
-
-                    const lecture = data[day]?.[slot] || '-'; // Check if lecture exists for this slot
-                    cell.textContent = lecture;
-
-                    row.appendChild(cell);
-                });
-
-                tbody.appendChild(row);
-            });
-
-            table.appendChild(tbody);
-            timetableContainer.appendChild(table);
-
-            // Show timetable section
-            timetableSection.classList.remove('hidden');
-        }
-    </script> -->
 </body>
 </html>

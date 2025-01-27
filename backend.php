@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             tt.day,
             tt.time_slot,
             tt.time_slot_end,
+            tt.lab_allocation,
+            st.batch,
             sub.name AS subject_name,
             sub.type AS subject_type,
             CONCAT(UPPER(LEFT(t.first_name, 1)), UPPER(LEFT(t.middle_name, 1)), UPPER(LEFT(t.last_name, 1))) AS teacher_initials
@@ -59,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $time_slots[] = $time_range;
         }
 
-        $timetable[$row['day']][$time_range] = "{$row['subject_name']} ({$row['subject_type']}) [{$row['teacher_initials']}]";
+        $timetable[$row['day']][$time_range] = "{$row['subject_name']} ({$row['lab_allocation']}) [{$row['teacher_initials']}]";
     }
 
     usort($time_slots, function($a, $b) {
@@ -83,10 +85,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 to { opacity: 1; transform: translateY(0); }
             }
         </style>
+          <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th, td {
+                border: 1px solid black;
+                padding: 8px;
+                text-align: center;
+            }
+        </style>
     </head>
     <body class='bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-8'>
         <div class='max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden'>
-            <div class='bg-blue-600 text-white p-6 text-center'>
+            <div class='bg-blue-600 text-white p-6 text-center ' id='timetable>
                 <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
                     Timetable for Batch: $batch, Semester: $semester
                 </h2>
@@ -189,13 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Display timetable on the webpage
     echo $html;
-
-    // Display Download as PDF button
-    // echo "<form method='post'>
-    //     <input type='hidden' name='batch' value='$batch'>
-    //     <input type='hidden' name='semester' value='$semester'>
-    //     <input type='submit' name='generate_pdf' value='Download as PDF' style='margin-top: 20px; padding: 10px 20px; font-size: 16px; cursor: pointer;'>
-    // </form>";
 } else {
     echo "Invalid request method.";
 }

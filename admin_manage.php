@@ -6,9 +6,9 @@ if (isset($_GET['delete']) && isset($_GET['type'])) {
     $id = intval($_GET['delete']);
     $type = $_GET['type'];
 
-    if ($type === 'teacher') {
+    if ($type == 'teacher') {
         $delete_query = "DELETE FROM teachers WHERE id = ?";
-    } elseif ($type === 'subject') {
+    } elseif ($type == 'subject') {
         $delete_query = "DELETE FROM subjects WHERE id = ?";
     }
 
@@ -49,6 +49,9 @@ $timetable_result = $conn->query($timetable_query);
     </style>
 </head>
 <body>
+    <a href="admin_timetable.php" class="block w-32 text-center flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out">
+        <span class="animate-pulse">View Timetable</span>
+    </a>
     <div class="container mx-auto p-8">
         <?php
         // Reset result pointers
@@ -58,6 +61,7 @@ $timetable_result = $conn->query($timetable_query);
         <!-- Teachers Section -->
         <div class="bg-white shadow-2xl rounded-2xl p-8 mb-12">
             <h1 class="text-3xl font-bold mb-6 text-blue-800">Manage Teachers</h1>
+
             <table class="w-full">
                 <thead>
                     <tr class="bg-blue-100">
