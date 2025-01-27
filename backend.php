@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </head>
     <body class='bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-8'>
         <div class='max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden'>
-            <div class='bg-blue-600 text-white p-6 text-center ' id='timetable>
+            <div class='bg-blue-600 text-white p-6 text-center '>
                 <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
                     Timetable for Batch: $batch, Semester: $semester
                 </h2>
