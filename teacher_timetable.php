@@ -78,9 +78,9 @@ $page_title = "Teacher Timetable for " . $full_name;
         }
 
         if ($row['subject_type'] === 'LAB') {
-            $timetable[$row['day']][$time_range][] = "{$row['batch']} → {$row['subject_name']} {$row['lab_allocation']} ({$row['teacher_name']})";
+            $timetable[$row['day']][$time_range][] = "{$row['batch']} → {$row['subject_name']} {$row['lab_allocation']} ({$row['teacher_name']}) ({$row['semester']})";
         } else {
-            $timetable[$row['day']][$time_range][] = "{$row['subject_name']} ({$row['teacher_name']})";
+            $timetable[$row['day']][$time_range][] = "{$row['subject_name']} ({$row['teacher_name']}) ({$row['semester']})";
         }
     }
 

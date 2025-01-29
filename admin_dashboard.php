@@ -156,19 +156,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 ?>
             </select>
+            
+            <select name="batch" id="batch" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
+                <option value="">Select Batch</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="C3">C3</option>
+            </select>
+
             <select id="lab_allocation" name="lab_allocation" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
                 <option value="">Select Lab</option>
                 <option value="LAB1">LAB1</option>
                 <option value="LAB2">LAB2</option>
                 <option value="LAB3">LAB3</option>
                 <option value="LAB4">LAB4</option>
-            </select>
-
-            <select name="batch" id="batch" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
-                <option value="">Select Batch</option>
-                <option value="C1">C1</option>
-                <option value="C2">C2</option>
-                <option value="C3">C3</option>
             </select>
 
             <select name="teacher" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">

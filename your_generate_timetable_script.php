@@ -90,16 +90,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($stmt->num_rows > 0) {
         // Overlap detected
-        // echo "<script>alert('Overlap detected! Please check the teacher, batch, or lab allocation for this time slot.');</script>";
+        echo "Error: " . $conn->error;
+        echo "<script>alert('Overlap detected! Please check the teacher, batch, or lab allocation for this time slot.');</script>";
         // echo "<script>alert('Error: " . $stmt->error . "');</script>";
 
         echo "Error: Overlap detected! Please check the teacher, batch, or lab allocation for this time slot.";
-        // echo "<script>window.history.back();</script>";
-        echo "Error: " . $conn->error;
+        echo "<script>window.history.back();</script>";
         
         // $stmt->close();
         // $conn->close();
-        // exit;
+        exit;
     }
     $stmt->close();
 
