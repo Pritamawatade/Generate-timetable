@@ -49,9 +49,22 @@ $timetable_result = $conn->query($timetable_query);
     </style>
 </head>
 <body>
-    <a href="admin_timetable.php" class="block w-32 text-center flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out">
-        <span class="animate-pulse">View Timetable</span>
+   <div class="flex items-center justify-center space-x-4 mb-8">
+     
+   <a href="admin_timetable.php" class=" w-62 text-center flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out">
+        <span class="animate-pulse">Semester wise timetable</span>
     </a>
+    <a href="admin_dashboard.php" class=" w-62 text-center flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-lg transition duration-300 ease-in-out">
+        <span class="animate-pulse">Dashboard</span>
+    </a>
+
+    <a href="index.php">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Home
+            </button>
+        </a>
+</div>
     <div class="container mx-auto p-8">
         <?php
         // Reset result pointers
@@ -85,7 +98,6 @@ $timetable_result = $conn->query($timetable_query);
                         <td class="p-3"><?php echo htmlspecialchars($teacher['last_name']); ?></td>
                         <td class="p-3">
                             <a href="edit_teacher.php?id=<?php echo $teacher['id']; ?>" class="text-blue-500 mr-2">Edit</a>
-                            <a href="?delete=<?php echo $teacher['id']; ?>&type=teacher" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</a>
                         </td>
                     </tr>
                     <?php 
@@ -127,7 +139,6 @@ $timetable_result = $conn->query($timetable_query);
                         <td class="p-3"><?php echo htmlspecialchars($subject['type']); ?></td>
                         <td class="p-3">
                             <a href="edit_subject.php?id=<?php echo $subject['id']; ?>" class="text-blue-500 mr-2">Edit</a>
-                            <a href="?delete=<?php echo $subject['id']; ?>&type=subject" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</a>
                         </td>
                     </tr>
                     <?php 
@@ -179,7 +190,7 @@ $timetable_result = $conn->query($timetable_query);
                             <td class="p-3"><?php echo htmlspecialchars($row['subject_id']); ?></td>
                             <td class="p-3"><?php echo htmlspecialchars($row['teacher_id']); ?></td>
                             <td class="p-3">
-                                <a href="edit_timetable.php?id=<?php echo $row['id']; ?>" class="text-blue-500 mr-2">Edit</a>
+                                
                                 <form action="delete_timetable.php" method="POST" style="display:inline;">
                                     <input type="hidden" name="id" value="<?php echo $row['id']; ?>">
                                     <button type="submit" class="text-red-500" onclick="return confirm('Are you sure?');">Delete</button>

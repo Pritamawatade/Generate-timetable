@@ -1,5 +1,6 @@
 <?php
 // Include dompdf library
+session_start();
 require 'dompdf/autoload.inc.php';
 
 use Dompdf\Dompdf;
@@ -19,9 +20,22 @@ $cdn_links = '
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 ';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $semester = $_POST['semester'];
-    $branch = $_POST['branch'];
+
+
+$teacher_id = $_SESSION['teacher_id'];
+$name_sql = "SELECT first_name, last_name FROM teachers WHERE id = ?";
+$name_stmt = $conn->prepare($name_sql);
+$name_stmt->bind_param("i", $teacher_id);
+$name_stmt->execute();
+$name_result = $name_stmt->get_result();
+$teacher = $name_result->fetch_assoc();
+$full_name = htmlspecialchars($teacher['first_name'] . ' ' . $teacher['last_name']);
+
+
+
+
+$page_title = "Teacher Timetable for " . $full_name;
+
 
     // SQL Query
     $sql = "
@@ -30,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             tt.time_slot,
             tt.time_slot_end,
             tt.batch,
+            tt.semester,
             tt.lab_allocation,
             sub.name AS subject_name,
             sub.type AS subject_type,
@@ -37,14 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         FROM timetable tt
         JOIN subjects sub ON tt.subject_id = sub.id
         JOIN teachers t ON tt.teacher_id = t.id
-        WHERE tt.semester = ? AND tt.branch = ?
+        WHERE tt.teacher_id = ?
         ORDER BY 
             FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
             TIME(tt.time_slot)
     ";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $semester, $branch);
+    $stmt->bind_param("i", $teacher_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -83,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Timetable - $branch Semester $semester</title>
+        <title>Timetable - $page_title</title>
         $cdn_links
         <style>
             table { width: 100%; border-collapse: collapse; }
@@ -93,11 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <body class='bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-8'>
         <div class='max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden' id='timetable1'>
             <div class='bg-blue-600 text-white p-6 text-center'>
-                <h1 class='text-4xl font-bold mb-4'>GOVERNMENT RESIDENTAL POLYTECHNIC COLLAGE OF WOMAN</h1>
-
                 <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
-                    Timetable for Branch: $branch, Semester: $semester
+                    Timetable for Teacher: $full_name
                 </h2>
+                                <h1 class='text-4xl font-bold mb-4'>GOVERNMENT RESIDENTAL POLYTECHNIC COLLAGE OF WOMAN</h1>
+
             </div>
             <div class='p-6 overflow-x-auto'>
                 <table class='w-full text-sm text-left text-gray-600 border-collapse' id='timetableAnimation'>
@@ -126,15 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class='p-6 text-center'>
                 <form method='post' class='inline-block'>
-                    <input type='hidden' name='semester' value='$semester'>
-                    <input type='hidden' name='branch' value='$branch'>
+                    <input type='hidden' name='semester' value='$full_name'>
+                    <input type='hidden' name='branch' value='$full_name'>
                     <button type='submit' name='generate_pdf' class='bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full'>
                         Download PDF
                     </button>
                 </form>
             </div>
-             
         </div>
+
           <a href='index.php'>
             <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home'>
                 <svg class='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 19l-7-7m0 0l7-7m-7 7h18'></path></svg>
@@ -153,15 +168,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dompdf->render();
 
         // Only include the div with id 'timetable1'
-        $dompdf->stream("timetable_branch{$branch}_semester{$semester}.pdf", ["Attachment" => true]);
+        $dompdf->stream("timetable_teacher{$full_name}.pdf", ["Attachment" => true]);
         exit;
     }
 
     // Display timetable on the webpage
     echo $html;
-} else {
-    echo "Invalid request method.";
-}
 
 $conn->close();
 ?>

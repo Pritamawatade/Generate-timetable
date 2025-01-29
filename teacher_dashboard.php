@@ -10,33 +10,99 @@ if (!isset($_SESSION['teacher_id'])) {
 }
 
 $teacher_id = $_SESSION['teacher_id'];
+$name_sql = "SELECT first_name, last_name FROM teachers WHERE id = ?";
+$name_stmt = $conn->prepare($name_sql);
+$name_stmt->bind_param("i", $teacher_id);
+$name_stmt->execute();
+$name_result = $name_stmt->get_result();
+$teacher = $name_result->fetch_assoc();
+$full_name = htmlspecialchars($teacher['first_name'] . ' ' . $teacher['last_name']);
+
+// Update the page title
+$page_title = "Teacher Timetable for " . $full_name;
 
 // Fetch timetable data for the logged-in teacher
+// $sql = "
+//         SELECT 
+//             tt.day,
+//             tt.time_slot,
+//             tt.time_slot_end,
+//             tt.semester,
+//             tt.lab_allocation,
+//             st.batch,
+//             sub.name AS subject_name,
+//             t.first_name AS teacher_name
+//         FROM timetable tt
+//         JOIN students st ON tt.batch_id = st.id
+//         JOIN subjects sub ON tt.subject_id = sub.id
+//         JOIN teachers t ON tt.teacher_id = t.id
+//         WHERE tt.teacher_id = ?
+//         ORDER BY 
+//             FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+//             tt.time_slot
+// ";
+
+
+
+
+
+
+
+
+// $sql = "
+//         SELECT 
+//            *,
+//             st.batch,
+//             sub.name AS subject_name,
+//             t.first_name AS teacher_name
+//         FROM timetable tt
+//         JOIN students st ON tt.batch_id = st.id
+//         JOIN subjects sub ON tt.subject_id = sub.id
+//         JOIN teachers t ON tt.teacher_id = t.id
+//         WHERE tt.teacher_id = ?
+//         ORDER BY 
+//             FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+//             tt.time_slot
+// ";
+
+
+
+
 $sql = "
-    SELECT 
-        tt.day,
-        tt.time_slot,
-        tt.time_slot_end,
-        tt.semester,
-        tt.lab_allocation,
-        st.batch,
-        sub.name AS subject_name,
-        t.first_name AS teacher_name
-    FROM timetable tt
-    JOIN students st ON tt.batch_id = st.id
-    JOIN subjects sub ON tt.subject_id = sub.id
-    JOIN teachers t ON tt.teacher_id = t.id
-    WHERE tt.teacher_id = ?
-    ORDER BY 
-        FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
-        tt.time_slot
+
+
+   SELECT 
+            tt.day,
+            tt.time_slot,
+            tt.time_slot_end,
+            tt.batch,
+            tt.semester,
+            tt.lab_allocation,
+            sub.name AS subject_name,
+            sub.type AS subject_type,
+            CONCAT(t.first_name, ' ', t.last_name) AS teacher_name
+        FROM timetable tt
+        JOIN subjects sub ON tt.subject_id = sub.id
+        JOIN teachers t ON tt.teacher_id = t.id
+        WHERE tt.teacher_id = ? 
+        ORDER BY 
+            FIELD(tt.day, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'),
+            TIME(tt.time_slot)
+
 ";
+
+
+
+
+
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $teacher_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $timetable = $result->fetch_all(MYSQLI_ASSOC);
+
+
 $stmt->close();
 $conn->close();
 
@@ -60,7 +126,8 @@ $conn->close();
 
 <body class="bg-gradient-to-r from-blue-100 to-purple-100 min-h-screen">
     <div class="container mx-auto py-10 px-4">
-        <h1 class="text-4xl font-bold text-center mb-8 text-gray-800 opacity-0" id="pageTitle">Teacher Timetable</h1>
+        <!-- <h1 class="text-4xl font-bold text-center mb-8 text-gray-800 opacity-0" id="pageTitle">Teacher Timetable for  </h1> -->
+        <h1 class="text-4xl font-bold text-center mb-8 text-gray-800 opacity-0" id="pageTitle"><?php echo $page_title; ?></h1>
 
         <div class="bg-white shadow-lg rounded-lg overflow-hidden opacity-0" id="timetableCard">
             <div class="overflow-x-auto">

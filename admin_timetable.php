@@ -2,23 +2,28 @@
 // Include database connection
 require_once 'db_connection.php';
 
-// Fetch semesters for dropdown
-$semesters_query = "SELECT DISTINCT semester FROM timetable ORDER BY semester ASC";
+// Fetch distinct branches and semesters
+$branches_query = "SELECT DISTINCT branch FROM timetable";
+$branches_result = $conn->query($branches_query);
+
+$semesters_query = "SELECT DISTINCT semester FROM timetable";
 $semesters_result = $conn->query($semesters_query);
 
-// Fetch timetable based on semester filter
+// Fetch timetable based on semester and branch filters
 $selected_semester = isset($_GET['semester']) ? $_GET['semester'] : '';
-$timetable_query = $selected_semester
+$selected_branch = isset($_GET['branch']) ? $_GET['branch'] : '';
+$timetable_query = ($selected_semester && $selected_branch)
     ? "SELECT t.*, s.name AS subject_name, CONCAT(teacher.first_name, ' ', teacher.last_name) AS teacher_name 
        FROM timetable t
        JOIN subjects s ON t.subject_id = s.id
        JOIN teachers teacher ON t.teacher_id = teacher.id
-       WHERE t.semester = '$selected_semester'
+       WHERE t.semester = '$selected_semester' AND t.branch = '$selected_branch'
        ORDER BY t.day, t.time_slot"
     : '';
 
-$timetable_result = $selected_semester ? $conn->query($timetable_query) : null;
+$timetable_result = ($selected_semester && $selected_branch) ? $conn->query($timetable_query) : null;
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,21 +38,44 @@ $timetable_result = $selected_semester ? $conn->query($timetable_query) : null;
 
 <div class="container py-6">
     <h1 class="text-3xl font-bold text-center mb-6">Semester-Wise Timetable</h1>
+    <a href="index.php">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Home
+            </button>
+        </a>
+    <a href="admin_dashboard.php">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home">
+                Admin dashboard
+            </button>
+        </a>
     
     <!-- Semester Selection -->
     <form method="GET" class="mb-6">
-        <div class="flex gap-4 justify-center">
-            <select name="semester" class="form-select w-1/3 p-2 border rounded-lg" required>
-                <option value="">Select Semester</option>
-                <?php while ($row = $semesters_result->fetch_assoc()): ?>
-                    <option value="<?= $row['semester'] ?>" <?= $row['semester'] == $selected_semester ? 'selected' : '' ?>>
-                        <?= $row['semester'] ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
-            <button type="submit" class="btn btn-primary">View Timetable</button>
-        </div>
-    </form>
+    <div class="flex gap-4 justify-center">
+        <!-- Branch Dropdown -->
+        <select name="branch" class="form-select w-1/3 p-2 border rounded-lg" required>
+            <option value="">Select Branch</option>
+            <?php while ($row = $branches_result->fetch_assoc()): ?>
+                <option value="<?= $row['branch'] ?>" <?= $row['branch'] == $selected_branch ? 'selected' : '' ?>>
+                    <?= $row['branch'] ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+
+        <!-- Semester Dropdown -->
+        <select name="semester" class="form-select w-1/3 p-2 border rounded-lg" required>
+            <option value="">Select Semester</option>
+            <?php while ($row = $semesters_result->fetch_assoc()): ?>
+                <option value="<?= $row['semester'] ?>" <?= $row['semester'] == $selected_semester ? 'selected' : '' ?>>
+                    <?= $row['semester'] ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
+        <button type="submit" class="btn btn-primary">View Timetable</button>
+    </div>
+</form>
+
 
     <!-- Timetable Display -->
     <?php if ($timetable_result && $timetable_result->num_rows > 0): ?>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($result->num_rows === 1) {
         $_SESSION['teacher_id'] = $teacher_id;
-        header("Location: teacher_dashboard.php");
+        header("Location: teacher_timetable.php");
         exit();
     } else {
         $error = "Invalid ID or Password.";

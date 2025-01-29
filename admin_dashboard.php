@@ -3,6 +3,22 @@
 include 'db_connection.php';
 // include 'navigation.php';
 
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if ($username == 'admin' && $password == 'pass123') {
+        // login successful
+        header("Location: admin_dashboard.php");
+        // exit();
+    } else {
+        echo "<script>alert('wrong id password');</script>";
+        echo "<script>window.history.back();</script>";
+    }
+}
+    
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,6 +57,17 @@ include 'db_connection.php';
         <h1 class="text-4xl font-bold text-center mb-12 text-blue-800 tracking-tight">
             Admin Dashboard
         </h1>
+        <a href='index.php'>
+            <button class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home'>
+                <svg class='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M10 19l-7-7m0 0l7-7m-7 7h18'></path></svg>
+                Back to Home
+            </button>
+        </a>
+    <a href='teacher_logout.php'>
+            <button class='bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home'>
+                logout
+            </button>
+        </a>
 
         <div class="grid md:grid-cols-3 gap-8">
             <!-- Manage Section -->
@@ -79,94 +106,110 @@ include 'db_connection.php';
                 </form>
             </div>
 
-            <!-- Generate Timetable Section -->
-            <div class="card bg-white rounded-2xl shadow-lg p-8 transform transition-all hover:scale-105 col-span-2">
-                <h2 class="text-3xl font-semibold mb-6 text-blue-800 text-center">Generate Timetable</h2>
-                <form action="your_generate_timetable_script.php" method="POST" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="space-y-4">
-        <select name="batch" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="">Select Batch</option>
-            <option value="C1">C1</option>
-            <option value="C2">C2</option>
-            <option value="C3">C3</option>
-        </select>
-        <select name="semester" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="">Select Semester</option>
-            <option value="1st semester">1st semester</option>
-            <option value="2nd semester">2nd semester</option>
-            <option value="3rd semester">3rd semester</option>
-            <option value="4th semester">4th semester</option>
-            <option value="5th semester">5th semester</option>
-            <option value="6th semester">6th semester</option>
-        </select>
-    </div>
-    <div class="space-y-4">
-        <select name="day" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="">Select Day</option>
-            <option value="Monday">Monday</option>
-            <option value="Tuesday">Tuesday</option>
-            <option value="Wednesday">Wednesday</option>
-            <option value="Thursday">Thursday</option>
-            <option value="Friday">Friday</option>
-            <option value="Saturday">Saturday</option>
-        </select>
-        <div class="grid grid-cols-2 gap-4">
-            <input type="time" name="time_slot" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <input type="time" name="time_slot_end" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+       <!-- Generate Timetable Section -->
+<div class="card bg-white rounded-2xl shadow-lg p-8 transform transition-all hover:scale-105 col-span-3 mb-32">
+    <h2 class="text-3xl font-semibold mb-6 text-blue-800 text-center">Generate Timetable</h2>
+    <form action="your_generate_timetable_script.php" method="POST" class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="space-y-4">
+            <select name="branch" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Branch</option>
+                <option value="Computer Engineering">Computer Engineering</option>
+                <option value="Medical Electronics">Medical Electronics</option>
+                <option value="Electronics And Telecommunication">Electronics And Telecommunication</option>
+                <option value="Dress Design And Garment Manufacturing">Dress Design And Garment Manufacturing</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+            </select>
+
+            <select name="semester" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Semester</option>
+                <option value="CO1K">CO1K</option>
+                <option value="CO2K">CO2K</option>
+                <option value="CO3K">CO3K</option>
+                <option value="CO4K">CO4K</option>
+                <option value="CO5K">CO5K</option>
+                <option value="CO6K">CO6K</option>
+            </select>
         </div>
-    </div>
-    <div class="md:col-span-2 space-y-4">
-        <select id="subject" name="subject" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="">Select Subject</option>
-            <?php
-            $subject_query = "SELECT name, type FROM subjects";
-            $subject_result = $conn->query($subject_query);
-            while ($row = $subject_result->fetch_assoc()) {
-                echo '<option value="' . $row['name'] . '" data-type="' . $row['type'] . '">' . $row['name'] . ' (' . $row['type'] . ')</option>';
-            }
-            ?>
-        </select>
-        <select id="lab_allocation" name="lab_allocation" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
-            <option value="">Select Lab</option>
-            <option value="LAB1">LAB1</option>
-            <option value="LAB2">LAB2</option>
-            <option value="LAB3">LAB3</option>
-            <option value="LAB4">LAB4</option>
-        </select>
-        <select name="teacher" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="">Select Teacher</option>
-            <?php
-            $teacher_query = "SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
-            $teacher_result = $conn->query($teacher_query);
-            while ($row = $teacher_result->fetch_assoc()) {
-                echo '<option value="' . $row['full_name'] . '">' . $row['full_name'] . '</option>';
-            }
-            ?>
-        </select>
-        <button type="submit" class="w-full bg-indigo-500 text-white py-4 rounded-lg hover:bg-indigo-600 transition-colors text-lg font-semibold">
-            Generate Timetable
-        </button>
-    </div>
-</form>
-
-<script>
-    // Show/Hide Lab Allocation field dynamically
-    document.getElementById('subject').addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const subjectType = selectedOption.getAttribute('data-type');
-        const labField = document.getElementById('lab_allocation');
-
-        if (subjectType === 'LAB') {
-            labField.classList.remove('hidden');
-            labField.required = true;
-        } else {
-            labField.classList.add('hidden');
-            labField.required = false;
-        }
-    });
-</script>
-
+        <div class="space-y-4">
+            <select name="day" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Day</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+            </select>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="time" name="time_slot" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <input type="time" name="time_slot_end" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
         </div>
+        <div class="md:col-span-2 space-y-4">
+            <select id="subject" name="subject" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Subject</option>
+                <?php
+                $subject_query = "SELECT id, name, type FROM subjects";
+                $subject_result = $conn->query($subject_query);
+                while ($row = $subject_result->fetch_assoc()) {
+                    echo '<option value="' . $row['id'] . '" data-type="' . $row['type'] . '">' . $row['name'] . ' (' . $row['type'] . ')</option>';
+                }
+                ?>
+            </select>
+            <select id="lab_allocation" name="lab_allocation" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
+                <option value="">Select Lab</option>
+                <option value="LAB1">LAB1</option>
+                <option value="LAB2">LAB2</option>
+                <option value="LAB3">LAB3</option>
+                <option value="LAB4">LAB4</option>
+            </select>
+
+            <select name="batch" id="batch" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
+                <option value="">Select Batch</option>
+                <option value="C1">C1</option>
+                <option value="C2">C2</option>
+                <option value="C3">C3</option>
+            </select>
+
+            <select name="teacher" required class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select Teacher</option>
+                <?php
+                $teacher_query = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
+                $teacher_result = $conn->query($teacher_query);
+                while ($row = $teacher_result->fetch_assoc()) {
+                    echo '<option value="' . $row['id'] . '">' . $row['full_name'] . '</option>';
+                }
+                ?>
+            </select>
+            <button type="submit" class="w-full bg-indigo-500 text-white py-4 rounded-lg hover:bg-indigo-600 transition-colors text-lg font-semibold">
+                Generate Timetable
+            </button>
+        </div>
+    </form>
+
+    <script>
+        // Show/Hide Lab Allocation and Batch fields dynamically
+        document.getElementById('subject').addEventListener('change', function () {
+            const selectedOption = this.options[this.selectedIndex];
+            const subjectType = selectedOption.getAttribute('data-type');
+            const labField = document.getElementById('lab_allocation');
+            const batchField = document.getElementById('batch');
+
+            if (subjectType === 'LAB') {
+                labField.classList.remove('hidden');
+                labField.required = true;
+                batchField.classList.remove('hidden');
+                batchField.required = true;
+            } else {
+                labField.classList.add('hidden');
+                labField.required = false;
+                batchField.classList.add('hidden');
+                batchField.required = false;
+            }
+        });
+    </script>
+</div>
+
 
     </div>
 
