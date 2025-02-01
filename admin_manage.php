@@ -164,6 +164,7 @@ $timetable_result = $conn->query($timetable_query);
                     <thead>
                         <tr class="bg-purple-100">
                             <th class="p-3">ID</th>
+                            <th class="p-3">BRENCH</th>
                             <th class="p-3">Batch ID</th>
                             <th class="p-3">Semester</th>
                             <th class="p-3">Day</th>
@@ -182,6 +183,7 @@ $timetable_result = $conn->query($timetable_query);
                         ?>
                         <tr class="border-b hover:bg-purple-50">
                             <td class="p-3"><?php echo htmlspecialchars($row['id']); ?></td>
+                            <td class="p-3"><?php echo htmlspecialchars($row['branch']); ?></td>
                             <td class="p-3"><?php echo htmlspecialchars($row['batch_id']); ?></td>
                             <td class="p-3"><?php echo htmlspecialchars($row['semester']); ?></td>
                             <td class="p-3"><?php echo htmlspecialchars($row['day']); ?></td>

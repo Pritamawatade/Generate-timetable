@@ -111,7 +111,7 @@ $page_title = "Teacher Timetable for " . $full_name;
                 <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
                     Timetable for Teacher: $full_name
                 </h2>
-                                <h1 class='text-4xl font-bold mb-4'>GOVERNMENT RESIDENTAL POLYTECHNIC COLLAGE OF WOMAN</h1>
+                                <h1 class='text-4xl font-bold mb-4'>Government Residential Women's Polytechnic Latur</h1>
 
             </div>
             <div class='p-6 overflow-x-auto'>

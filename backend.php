@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <body class='bg-gradient-to-br from-blue-50 to-blue-100 min-h-screen p-8'>
         <div class='max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl overflow-hidden' id='timetable1'>
             <div class='bg-blue-600 text-white p-6 text-center'>
-                <h1 class='text-4xl font-bold mb-4'>GOVERNMENT RESIDENTAL POLYTECHNIC COLLAGE OF WOMAN</h1>
+                <h1 class='text-4xl font-bold mb-4'>Government Residential Women's Polytechnic Latur</h1>
 
                 <h2 class='text-3xl font-bold tracking-tight animate-pulse'>
                     Timetable for Branch: $branch, Semester: $semester

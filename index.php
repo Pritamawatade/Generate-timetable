@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Timetable Management System</title>
+    <title>Time Generator System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -38,7 +38,7 @@
         </div>
 
         <div class="container mx-auto text-center text-white relative z-10">
-            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">Effortless Timetable Management</h1>
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">Effortless Time Generator</h1>
             <p class="text-lg md:text-xl mb-8 animate-fade-in-delayed">Organize classes, manage schedules, and simplify your workflow with ease.</p>
 
             <div class="flex justify-center space-x-4 animate-fade-in-delayed-2">

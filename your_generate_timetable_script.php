@@ -18,15 +18,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $start_time_converted = date("H:i:s", strtotime($start_time));
     $end_time_converted = date("H:i:s", strtotime($end_time));
 
-    // Prepare statements to fetch IDs for batch, subject, and teacher
-    $batch_query = "SELECT id FROM students WHERE batch = ? LIMIT 1";
-    $subject_query = "SELECT id, type FROM subjects WHERE id = ?";
-    // $teacher_query = "SELECT id FROM teachers WHERE CONCAT(first_name, ' ', last_name) = ?";
+    // Fetch teacher ID
     $teacher_query = "SELECT id FROM teachers WHERE id = ?";
+    $stmt = $conn->prepare($teacher_query);
+    $stmt->bind_param("s", $teacher);
+    $stmt->execute();
+    $stmt->bind_result($teacher_id);
+    $stmt->fetch();
+    $stmt->close();
 
-    // Fetch batch_id (if batch is provided)
+    // Fetch subject ID and type
+    $subject_query = "SELECT id, type FROM subjects WHERE id = ?";
+    $stmt = $conn->prepare($subject_query);
+    $stmt->bind_param("i", $subject);
+    $stmt->execute();
+    $stmt->bind_result($subject_id, $subject_type);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Fetch batch ID if batch is provided
     $batch_id = null;
     if (!empty($batch)) {
+        $batch_query = "SELECT id FROM students WHERE batch = ? LIMIT 1";
         $stmt = $conn->prepare($batch_query);
         $stmt->bind_param("s", $batch);
         $stmt->execute();
@@ -35,78 +48,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
     }
 
-    // Fetch subject_id and type
-
-    $stmt = $conn->prepare($subject_query);
-    $stmt->bind_param("i", $subject);
-    $stmt->execute();
-    $stmt->bind_result($subject_id, $subject_type);
-    $stmt->fetch();
-    $stmt->close();
-
-    // Fetch teacher_id
-    $stmt = $conn->prepare($teacher_query);
-    $stmt->bind_param("s", $teacher);
-    $stmt->execute();
-    $stmt->bind_result($teacher_id);
-    $stmt->fetch();
-    $stmt->close();
-
-    // Check for timetable overlap
     $overlap_query = "
-        SELECT id 
-        FROM timetable 
-        WHERE 
-            day = ? 
-            AND (
-                (time_slot < ? AND time_slot_end > ?) OR 
-                (time_slot < ? AND time_slot_end > ?) OR 
-                (time_slot >= ? AND time_slot_end <= ?)
-            )
-            AND (
-                teacher_id = ? OR 
-                (batch_id = ? AND semester = ?) OR 
-                (lab_allocation = ? AND lab_allocation IS NOT NULL)
-            )
-    ";
+    SELECT id FROM timetable
+    WHERE 
+        day = ?
+        AND (
+            (time_slot < ? AND time_slot_end > ?) OR  -- Case 1: New slot starts inside an existing slot
+            (time_slot < ? AND time_slot_end > ?) OR  -- Case 2: New slot ends inside an existing slot
+            (time_slot >= ? AND time_slot_end <= ?)   -- Case 3: New slot is fully within an existing slot
+        )
+        AND (
+            teacher_id = ? OR
+            (batch_id = ?) OR 
+            (lab_allocation = ?) 
+            AND (branch = ?)
+            AND (semester = ?)
+        )
+";
 
-    $stmt = $conn->prepare($overlap_query);
-    $stmt->bind_param(
-        "sssssssiiis",
-        $day,
-        $end_time_converted,
-        $start_time_converted,
-        $start_time_converted,
-        $end_time_converted,
-        $start_time_converted,
-        $end_time_converted,
-        $teacher_id,
-        $batch_id,
-        $semester,
-        $lab_allocation
-    );
-    $stmt->execute();
-    $stmt->store_result();
+$stmt = $conn->prepare($overlap_query);
+$stmt->bind_param(
+    "ssssssisisss",
+    $day,
+    $end_time_converted,
+    $start_time_converted,
+    $start_time_converted,
+    $end_time_converted,
+    $start_time_converted,
+    $end_time_converted,
+    $teacher_id, // ✅ Check if the teacher is already scheduled
+    $batch_id,   // ✅ Check if the batch is already scheduled
+    $lab_allocation, // ✅ Prevent lab double-booking
+    $branch,
+    $semester
+);
+$stmt->execute();
+$stmt->store_result();
+if ($stmt->num_rows > 0) {
+    echo "<script>alert('Conflict detected with another class. Teacher or class is busy. Please choose a different time slot.'); window.history.back();</script>";
+    exit;
+}
+$stmt->close();
 
-    if ($stmt->num_rows > 0) {
-        // Overlap detected
-        echo "Error: " . $conn->error;
-        echo "<script>alert('Overlap detected! Please check the teacher, batch, or lab allocation for this time slot.');</script>";
-        // echo "<script>alert('Error: " . $stmt->error . "');</script>";
 
-        echo "Error: Overlap detected! Please check the teacher, batch, or lab allocation for this time slot.";
-        echo "<script>window.history.back();</script>";
-        
-        // $stmt->close();
-        // $conn->close();
-        exit;
-    }
-    $stmt->close();
-
-    // Prepare insertion query
-    $insert_query = "INSERT INTO timetable 
-        (batch_id, semester, day, time_slot, time_slot_end, subject_id, teacher_id, lab_allocation, batch, branch) 
+    // ✅ **Insert Data if No Overlap**
+    $insert_query = "
+        INSERT INTO timetable 
+            (batch_id, semester, day, time_slot, time_slot_end, subject_id, teacher_id, lab_allocation, batch, branch) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
     $stmt = $conn->prepare($insert_query);
 
     if ($subject_type === 'LAB') {
@@ -125,8 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $branch
         );
     } else {
-        $n = "";    
-        
+        $n="";
         // Theory subjects do not require batch and lab_allocation
         $stmt->bind_param(
             "issssissss",
@@ -137,8 +126,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $end_time_converted,
             $subject_id,
             $teacher_id,
-            $n, // Lab allocation not needed
-            $n, // Batch not needed
+            $n,
+            $n,
             $branch
         );
     }
@@ -151,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<script>alert('Failed to generate timetable. Please check your inputs.');</script>";
         echo 'Error: ' . $stmt->error;
     }
+    
     $stmt->close();
     $conn->close();
 }
