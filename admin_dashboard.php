@@ -57,15 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="min-h-screen px-8 py-16">
-<div class="mb-4 fixed top-20 " style="right: 8%;">
+    <div class="mb-4 fixed top-20 " style="right: 8%;">
 
-<a href='teacher_logout.php'>
-    <button
-        class='text-lg bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home'>
-        Logout
-    </button>
-</a>
-</div>
+        <a href='teacher_logout.php' class="z-5">
+            <button
+                class='text-lg bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-110 home'>
+                Logout
+            </button>
+        </a>
+    </div>
     <div class="container mx-auto">
         <h1 class="text-4xl font-bold text-center mb-12 text-blue-800 tracking-tight">
             Admin Dashboard
@@ -74,7 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="grid md:grid-cols-3 gap-8">
             <!-- Manage Section -->
-            <div class="card bg-white rounded-2xl shadow-lg p-6 flex items-center justify-center transform transition-all hover:scale-105 ">
+            <div
+                class="card bg-white rounded-2xl shadow-lg p-6 flex items-center justify-center transform transition-all hover:scale-105 ">
                 <h2 class="text-md font-semibold mb-4 text-blue-700">Quick Actions</h2>
                 <a href="admin_manage.php"
                     class="block w-full bg-blue-500 text-white py-3 rounded-lg text-center hover:bg-blue-600 transition-colors">
@@ -102,6 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Add Subject Section -->
             <div class="card bg-white rounded-2xl shadow-lg p-6 transform transition-all hover:scale-105 ">
                 <h2 class="text-2xl font-semibold mb-4 text-blue-700">Add Subject</h2>
+
+                <!-- 
                 <form action="your_add_subject_script.php" method="POST" class="space-y-4">
                     <input type="text" name="subject_name" placeholder="Subject Name" required
                         class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -114,150 +117,295 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         class="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
                         Add Subject
                     </button>
+                </form> -->
+
+
+                <form action="your_add_subject_script.php" method="POST" class="space-y-4">
+                    <!-- Branch Selection -->
+                    <select name="branch" id="branch1" required
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Branch</option>
+                        <option value="Computer Engineering">Computer Engineering</option>
+                        <option value="Medical Electronics">Medical Electronics</option>
+                        <option value="Electronics And Telecommunication">Electronics And Telecommunication</option>
+                        <option value="Dress Design And Garment Manufacturing">Dress Design And Garment Manufacturing
+                        </option>
+                        <option value="Civil Engineering">Civil Engineering</option>
+                    </select>
+
+                    <!-- Semester Selection (Will be populated dynamically) -->
+                    <select name="semester" id="semester1" required
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select Semester</option>
+                        <!-- Options will be populated dynamically using JavaScript -->
+                    </select>
+
+                    <!-- Subject Name -->
+                    <input type="text" name="subject_name" placeholder="Subject Name" required
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+
+                    <!-- Subject Type -->
+                    <select name="subject_type" required
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Theory">Theory</option>
+                        <option value="LAB">LAB</option>
+                    </select>
+
+                    <button type="submit"
+                        class="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
+                        Add Subject
+                    </button>
                 </form>
+
+<!-- // semesster logic for subject -->
+                <script>
+                    // Define semester options for each branch
+                    const semesterOptions1 = {
+                        "Computer Engineering": ["CO1K", "CO2K", "CO3K", "CO4K", "CO5K", "CO5I", "CO6K", "CO6I"],
+                        "Medical Electronics": ["MEO1", "MEO2", "MEO3", "MEO4", "MEO5", "MEO6"],
+                        "Electronics And Telecommunication": ["ETO1", "ETO2", "ETO3", "ETO4", "ETO5", "ETO6"],
+                        "Dress Design And Garment Manufacturing": ["DDO1", "DDO2", "DDO3", "DDO4", "DDO5", "DDO6"],
+                        "Civil Engineering": ["CEO1", "CEO2", "CEO3", "CEO4", "CEO5", "CEO6"]
+                    };
+
+                    // Get references to select elements
+                    const branchSelect1 = document.getElementById("branch1");
+                    const semesterSelect1 = document.getElementById("semester1");
+
+                    // Function to update semester dropdown
+                    function updateSemesters1() {
+
+
+                        const selectedBranch = branchSelect1.value;
+                        const semesters = semesterOptions1[selectedBranch] || [];
+
+                        semesterSelect1.innerHTML = '<option value="">Select Semester</option>';
+                        semesters.forEach(sem => {
+                            const option = document.createElement("option");
+                            option.value = sem;
+                            option.textContent = sem;
+                            semesterSelect1.appendChild(option);
+                        });
+                    }
+
+                    // Run update function when branch changes
+                    branchSelect1.addEventListener("change", updateSemesters1);
+                </script>
+
+
             </div>
 
-            <!-- Generate Timetable Section -->
-            <div
-                class="card bg-white rounded-2xl shadow-lg p-8 transform transition-all hover:scale-105 col-span-3 mb-32">
-                <h2 class="text-3xl font-semibold mb-6 text-blue-800 text-center">Generate Timetable</h2>
-                <form action="your_generate_timetable_script.php" method="POST"
-                    class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div class="space-y-4">
-                        <!-- Branch Selection -->
-                        <select name="branch" id="branch" required
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="Computer Engineering">Computer Engineering</option>
-                            <option value="Medical Electronics">Medical Electronics</option>
-                            <option value="Electronics And Telecommunication">Electronics And Telecommunication</option>
-                            <option value="Dress Design And Garment Manufacturing">Dress Design And Garment
-                                Manufacturing</option>
-                            <option value="Civil Engineering">Civil Engineering</option>
-                        </select>
+            <div class=" bg-white rounded-2xl shadow-xl p-8 mb-32 col-span-3 z-50">
+                <!-- Header Section -->
+                <div class="text-center mb-10">
+                    <h2 class="text-3xl font-bold text-blue-800">
+                        <i class="fas fa-calendar-plus mr-3"></i>Generate Timetable
+                    </h2>
+                    <p class="text-gray-600 mt-2">Create and schedule new timetable entries</p>
+                </div>
 
-                        <!-- Semester Selection (Will be populated dynamically) -->
-                        <select name="semester" id="semester" required
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <!-- Default options will be replaced dynamically -->
-                        </select>
-                    </div>
+                <form action="your_generate_timetable_script.php" method="POST" class="space-y-8">
+                    <!-- Branch & Semester Section -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="branch" class="block text-sm font-medium text-gray-700">Branch</label>
+                            <select name="branch" id="branch" required
+                                class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Branch</option>
+                                <option value="Computer Engineering">Computer Engineering</option>
+                                <option value="Medical Electronics">Medical Electronics</option>
+                                <option value="Electronics And Telecommunication">Electronics And Telecommunication
+                                </option>
+                                <option value="Dress Design And Garment Manufacturing">Dress Design And Garment
+                                    Manufacturing</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                            </select>
+                        </div>
 
-                    <script>
-                        // Define semester options for each branch
-                        const semesterOptions = {
-                            "Computer Engineering": ["CO1K", "CO2K", "CO3K", "CO4K", "CO5K", "CO5i", "CO6K", "CO6i"],
-                            "Medical Electronics": ["MEO1", "MEO2", "MEO3", "MEO4", "MEO5", "MEO6"],
-                            "Electronics And Telecommunication": ["ETO1", "ETO2", "ETO3", "ETO4", "ETO5", "ETO6"],
-                            "Dress Design And Garment Manufacturing": ["DDO1", "DDO2", "DDO3", "DDO4", "DDO5", "DDO6"],
-                            "Civil Engineering": ["CEO1", "CEO2", "CEO3", "CEO4", "CEO5", "CEO6"]
-                        };
-
-                        // Get reference to select elements
-                        const branchSelect = document.getElementById("branch");
-                        const semesterSelect = document.getElementById("semester");
-
-                        // Function to update semester dropdown
-                        function updateSemesters() {
-                            // Get selected branch
-                            const selectedBranch = branchSelect.value;
-
-                            // Get corresponding semesters
-                            const semesters = semesterOptions[selectedBranch] || [];
-
-                            // Clear existing options
-                            semesterSelect.innerHTML = "";
-
-                            // Add new options
-                            semesters.forEach(sem => {
-                                const option = document.createElement("option");
-                                option.value = sem;
-                                option.textContent = sem;
-                                semesterSelect.appendChild(option);
-                            });
-                        }
-
-                        // Run update function when branch changes
-                        branchSelect.addEventListener("change", updateSemesters);
-
-                        // Initialize with default branch selection
-                        updateSemesters();
-                    </script>
-
-                    <div class="space-y-4">
-                        <select name="day" required
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="Monday">Monday</option>
-                            <option value="Tuesday">Tuesday</option>
-                            <option value="Wednesday">Wednesday</option>
-                            <option value="Thursday">Thursday</option>
-                            <option value="Friday">Friday</option>
-                            <option value="Saturday">Saturday</option>
-                        </select>
-                        <div class="grid grid-cols-2 gap-4">
-                            <input type="time" name="time_slot" required
-                                class="w-full p-4 text-lg border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <input type="time" name="time_slot_end" required
-                                class="w-full p-4 text-lg border rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <div class="space-y-2">
+                            <label for="semester" class="block text-sm font-medium text-gray-700">Semester</label>
+                            <select name="semester" id="semester" required
+                                class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Semester</option>
+                            </select>
                         </div>
                     </div>
-                    <div class="md:col-span-2 space-y-4">
-                        <select id="subject" name="subject" required
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Select Subject</option>
-                            <?php
-                            $subject_query = "SELECT id, name, type FROM subjects";
-                            $subject_result = $conn->query($subject_query);
-                            while ($row = $subject_result->fetch_assoc()) {
-                                echo '<option value="' . $row['id'] . '" data-type="' . $row['type'] . '">' . $row['name'] . ' (' . $row['type'] . ')</option>';
-                            }
-                            ?>
-                        </select>
 
-                        <select name="batch" id="batch"
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
-                            <option value="C1">C1</option>
-                            <option value="C2">C2</option>
-                            <option value="C3">C3</option>
-                        </select>
+                    <!-- Day & Time Section -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="day" class="block text-sm font-medium text-gray-700">Day</label>
+                            <select name="day" required
+                                class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Day</option>
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                            </select>
+                        </div>
 
-                        <select id="lab_allocation" name="lab_allocation"
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 hidden">
-                            <option value="">Select Lab</option>
-                            <option value="LAB1">LAB1</option>
-                            <option value="LAB2">LAB2</option>
-                            <option value="LAB3">LAB3</option>
-                            <option value="LAB4">LAB4</option>
-                            <option value="LAB5">LAB5</option>
-                            <option value="DH-1">DH-1</option>
-                            <option value="DH-2">DH-2</option>
-                        </select>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Time Slot</label>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="time_slot" class="block text-xs text-gray-500">Start Time</label>
+                                    <input type="time" name="time_slot" required
+                                        class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                </div>
+                                <div>
+                                    <label for="time_slot_end" class="block text-xs text-gray-500">End Time</label>
+                                    <input type="time" name="time_slot_end" required
+                                        class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <select name="teacher" required
-                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Select Teacher</option>
-                            <?php
-                            $teacher_query = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
-                            $teacher_result = $conn->query($teacher_query);
-                            while ($row = $teacher_result->fetch_assoc()) {
-                                echo '<option value="' . $row['id'] . '">' . $row['full_name'] . '</option>';
-                            }
-                            ?>
-                        </select>
+                    <!-- Subject & Teacher Section -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+                            <select id="subject" name="subject" required
+                                class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Subject</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="teacher" class="block text-sm font-medium text-gray-700">Teacher</label>
+                            <select name="teacher" required
+                                class="block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Teacher</option>
+                                <?php
+                                $teacher_query = "SELECT id, CONCAT(first_name, ' ', last_name) AS full_name FROM teachers";
+                                $teacher_result = $conn->query($teacher_query);
+                                while ($row = $teacher_result->fetch_assoc()) {
+                                    echo '<option value="' . $row['id'] . '">' . $row['full_name'] . '</option>';
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Lab & Batch Section (Hidden by Default) -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label for="batch" class="block text-sm font-medium text-gray-700 hidden">Batch</label>
+                            <select name="batch" id="batch"
+                                class="hidden block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Batch</option>
+                                <option value="C1">C1</option>
+                                <option value="C2">C2</option>
+                                <option value="C3">C3</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label for="lab_allocation" class="block text-sm font-medium text-gray-700 hidden">Lab
+                                Allocation</label>
+                            <select id="lab_allocation" name="lab_allocation"
+                                class="hidden block w-full p-3 text-gray-700 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                                <option value="">Select Lab</option>
+                                <option value="LAB1">LAB1</option>
+                                <option value="LAB2">LAB2</option>
+                                <option value="LAB3">LAB3</option>
+                                <option value="LAB4">LAB4</option>
+                                <option value="LAB5">LAB5</option>
+                                <option value="DH-1">DH-1</option>
+                                <option value="DH-2">DH-2</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
                         <button type="submit"
-                            class="w-full bg-indigo-500 text-white py-4 rounded-lg hover:bg-indigo-600 transition-colors text-lg font-semibold">
+                            class="w-full bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all duration-300 text-lg font-semibold flex items-center justify-center">
+                            <i class="fas fa-calendar-check mr-2"></i>
                             Generate Timetable
                         </button>
                     </div>
                 </form>
 
+                <!-- Original Scripts -->
                 <script>
-                    // Show/Hide Lab Allocation and Batch fields dynamically
-                    document.getElementById('subject').addEventListener('change', function () {
+                    // Define semester options for each branch
+                    const semesterOptions = {
+                        "Computer Engineering": ["CO1K", "CO2K", "CO3K", "CO4K", "CO5K", "CO5I", "CO6K", "CO6I"],
+                        "Medical Electronics": ["MEO1", "MEO2", "MEO3", "MEO4", "MEO5", "MEO6"],
+                        "Electronics And Telecommunication": ["ETO1", "ETO2", "ETO3", "ETO4", "ETO5", "ETO6"],
+                        "Dress Design And Garment Manufacturing": ["DDO1", "DDO2", "DDO3", "DDO4", "DDO5", "DDO6"],
+                        "Civil Engineering": ["CEO1", "CEO2", "CEO3", "CEO4", "CEO5", "CEO6"]
+                    };
+
+                    const branchSelect = document.getElementById("branch");
+                    const semesterSelect = document.getElementById("semester");
+
+                    function updateSemesters() {
+                        const selectedBranch = branchSelect.value;
+                        const semesters = semesterOptions[selectedBranch] || [];
+                        semesterSelect.innerHTML = '<option value="">Select Semester</option>';
+
+                        semesters.forEach(sem => {
+                            const option = document.createElement("option");
+                            option.value = sem;
+                            option.textContent = sem;
+                            semesterSelect.appendChild(option);
+                        });
+                    }
+
+                    branchSelect.addEventListener("change", updateSemesters);
+                    updateSemesters();
+
+                    const semesterElement = document.getElementById("semester");
+                    const branchElement = document.getElementById("branch");
+                    const subjectElement = document.getElementById("subject");
+                    const labField = document.getElementById('lab_allocation');
+                    const batchField = document.getElementById('batch');
+
+                    semesterElement.addEventListener("change", function () {
                         const selectedOption = this.options[this.selectedIndex];
                         const subjectType = selectedOption.getAttribute('data-type');
-                        const labField = document.getElementById('lab_allocation');
-                        const batchField = document.getElementById('batch');
 
+                        if(!selectedOption || !subjectType || subjectType === 'Theory' || selectedOption.value === '') {
+                            labField.classList.add('hidden');
+                            labField.required = false;
+                            batchField.classList.add('hidden');
+                            batchField.required = false;
+                        }
+                        const branch = branchElement.value;
+                        const semester = this.value;
+
+                        fetch(`get_subjects.php?branch=${encodeURIComponent(branch)}&semester=${encodeURIComponent(semester)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                subjectElement.innerHTML = '<option value="">Select Subject</option>';
+                                data.forEach(subject => {
+                                    const option = document.createElement("option");
+                                    option.value = subject.id;
+                                    option.textContent = subject.name + " (" + subject.type + ")";
+                                    option.setAttribute("data-type", subject.type);
+                                    subjectElement.appendChild(option);
+                                });
+                            })
+                            .catch(error => {
+                                console.error("Error fetching subjects:", error);
+                            });
+                    });
+
+                    subjectElement.addEventListener('change', function () {
+                        const selectedOption = this.options[this.selectedIndex];
+                        const subjectType = selectedOption.getAttribute('data-type');
+
+                        if(!selectedOption || !subjectType || subjectType === 'Theory' || selectedOption.value === '') {
+                            labField.classList.add('hidden');
+                            labField.required = false;
+                            batchField.classList.add('hidden');
+                            batchField.required = false;
+                        }
                         if (subjectType === 'LAB') {
                             labField.classList.remove('hidden');
                             labField.required = true;
@@ -289,7 +437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </button>
             </a>
         </div>
-    
+
 
         <script>
             // GSAP Animations
