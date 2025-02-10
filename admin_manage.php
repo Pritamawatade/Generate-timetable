@@ -233,8 +233,8 @@ $timetable_result = $conn->query($timetable_query);
                                         </span>
                                     </td>
                                     <td class="px-6 py-4"><?php
-                                        $batch_id = $row['batch_id'];
-                                        echo !empty($batch_id) ? 'C' . htmlspecialchars($batch_id) : '';
+                                        $batch_id = $row['batch'];
+                                        echo !empty($batch_id) ?  htmlspecialchars($batch_id) : '';
                                     ?></td>
                                     <td class="px-6 py-4"><?php echo htmlspecialchars($row['semester']); ?></td>
                                     <td class="px-6 py-4"><?php echo htmlspecialchars($row['day']); ?></td>

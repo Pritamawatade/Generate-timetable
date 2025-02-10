@@ -18,6 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $start_time_converted = date("H:i:s", strtotime($start_time));
     $end_time_converted = date("H:i:s", strtotime($end_time));
 
+    // Check if start time is in the future compared to end time
+    if ($start_time >= $end_time) {
+        echo "<script>alert('Start time must be earlier than end time.'); window.history.back();</script>";
+        exit;
+    }
+
+
+    
     // Fetch teacher ID
     $teacher_query = "SELECT id FROM teachers WHERE id = ?";
     $stmt = $conn->prepare($teacher_query);
@@ -39,56 +47,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Fetch batch ID if batch is provided
     $batch_id = null;
     if (!empty($batch)) {
-        $batch_query = "SELECT id FROM students WHERE batch = ? LIMIT 1";
+        $batch_query = "SELECT id FROM students WHERE batch = ? AND semester = ? LIMIT 1";
         $stmt = $conn->prepare($batch_query);
-        $stmt->bind_param("s", $batch);
+        $stmt->bind_param("ss", $batch, $semester);
         $stmt->execute();
         $stmt->bind_result($batch_id);
         $stmt->fetch();
         $stmt->close();
     }
-
     $overlap_query = "
     SELECT id FROM timetable
     WHERE 
-        day = ?
+        day = ? 
         AND (
             (time_slot < ? AND time_slot_end > ?) OR  -- Case 1: New slot starts inside an existing slot
             (time_slot < ? AND time_slot_end > ?) OR  -- Case 2: New slot ends inside an existing slot
-            (time_slot >= ? AND time_slot_end <= ?)   -- Case 3: New slot is fully within an existing slot
-        )
+            (time_slot >= ? AND time_slot_end <= ?) OR -- Case 3: New slot is fully within an existing slot
+            (time_slot <= ? AND time_slot_end >= ?)  -- Case 4: Existing slot fully contains the new slot
+        ) 
         AND (
-            teacher_id = ? OR
-            (batch_id = ?) OR 
-            (lab_allocation = ?) 
-            AND (branch = ?)
+            teacher_id = ? OR 
+            batch_id = ? OR 
+            lab_allocation = ? 
             AND (semester = ?)
-        )
+        ) 
+        
+        
 ";
 
-$stmt = $conn->prepare($overlap_query);
-$stmt->bind_param(
-    "ssssssisisss",
-    $day,
-    $end_time_converted,
-    $start_time_converted,
-    $start_time_converted,
-    $end_time_converted,
-    $start_time_converted,
-    $end_time_converted,
-    $teacher_id, // ✅ Check if the teacher is already scheduled
-    $batch_id,   // ✅ Check if the batch is already scheduled
-    $lab_allocation, // ✅ Prevent lab double-booking
-    $branch,
-    $semester
-);
-$stmt->execute();
-$stmt->store_result();
-if ($stmt->num_rows > 0) {
-    echo "<script>alert('Conflict detected with another class. Teacher or class is busy. Please choose a different time slot.'); window.history.back();</script>";
-    exit;
-}
-$stmt->close();
+    // Prepare the statement
+    $stmt = $conn->prepare($overlap_query);
+
+    // Bind parameters
+    $stmt->bind_param(
+        "sssssssssiiss",
+        $day,
+        $end_time_converted,
+        $start_time_converted,
+        $start_time_converted,
+        $end_time_converted,
+        $start_time_converted,
+        $end_time_converted,
+        $start_time_converted,
+        $end_time_converted,
+        $teacher_id,  // ✅ Check if the teacher is already scheduled
+        $batch_id,  // ✅ Check if the batch is already scheduled
+        $lab_allocation,
+        $semester
+
+    );
+
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($conflict_id);
+        while ($stmt->fetch()) {
+            echo "<script>alert('Conflict detected with another class. Conflict ID: $conflict_id. Teacher or class is busy. Please choose a different time slot.'); window.history.back();</script>";
+        }
+        exit;
+    }
+    $stmt->close();
 
 
     // ✅ **Insert Data if No Overlap**
@@ -96,7 +114,7 @@ $stmt->close();
         INSERT INTO timetable 
             (batch_id, semester, day, time_slot, time_slot_end, subject_id, teacher_id, lab_allocation, batch, branch) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
+
     $stmt = $conn->prepare($insert_query);
 
     if ($subject_type === 'LAB') {
@@ -115,7 +133,7 @@ $stmt->close();
             $branch
         );
     } else {
-        $n="";
+        $n = "";
         // Theory subjects do not require batch and lab_allocation
         $stmt->bind_param(
             "issssissss",
@@ -140,8 +158,7 @@ $stmt->close();
         echo "<script>alert('Failed to generate timetable. Please check your inputs.');</script>";
         echo 'Error: ' . $stmt->error;
     }
-    
+
     $stmt->close();
     $conn->close();
 }
-?>
